@@ -1,26 +1,69 @@
-#  Как работать с репозиторием финального задания
+# Kittygram
 
-## Что нужно сделать
+[![Main Kittygram workflow](https://github.com/lvnmary/kittygram_final/actions/workflows/main.yml/badge.svg)](https://github.com/lvnmary/kittygram_final/actions/workflows/main.yml)
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+## Описание:
+Kittygram — это социальная сеть, созданная специально для любителей кошек. Пользователи могут регистрироваться, загружать фотографии своих питомцев, указывая их имя, цвет, дату рождения и достижения.
 
-## Как проверить работу с помощью автотестов
+## Стек технологий:
+- Python
+- Django
+- API
+- Nginx
+- Djoser
+- Gunicorn 
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
+## Ознакомиться с проектом можно по ссылке:
+https://kittygram-lvnmary.ddns.net
+
+## Как запустить проект:
+Клонировать репозиторий и перейти в него в командной строке
+
+```
+git clone git@github.com:lvnmary/kittygram_final.git
 ```
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+Перейти в корневую директорию
+```
+cd kittygram_final
+```
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
+Создать файл .evn для хранения ключей
 
-## Чек-лист для проверки перед отправкой задания
+Запустить docker-compose.production
 
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+```
+docker compose -f docker-compose.production.yml up
+```
+
+Выполнить миграции, сбор статики
+
+```
+docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /static/static/
+
+```
+
+Создать суперпользователя
+
+```
+docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser
+```
+
+### Проект Kittygram включает две версии для развёртывания: обыкновенную (для разработки) и прод-версию (для использования на производственных серверах).
+Для разработки:
+- файл - docker-compose.yml;
+- сборка образов локально для backend, frontend и gateway;
+- тома: pg_data, static, media;
+- локальная отладка и внесение изменений.
+
+Продакшн-версия:
+- файл - docker-compose.production.yml;
+- готовые образы из Docker Hub: lvnmary/kittygram_backend, lvnmary/kittygram_frontend, lvnmary/kittygram_gateway;
+- тома: pg_data_production, static_volume, media;
+- стабильная и протестированная версия.
+
+## Автор:
+Левина Мария 
+https://github.com/lvnmary
